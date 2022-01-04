@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import React, {Component} from 'react'
+import { Link } from 'react-router-dom'
+import { Stack } from './common/contentstack-api/api'
 
-export default App;
+export default class Home extends Component{
+    constructor() {
+      super()
+      this.state = { loading : true, result: null}
+    }
+    componentDidMount () {
+      var  Query = Stack.ContentType("posts").Query()
+      .toJSON()
+      .find()
+      .then((result) => {
+        console.log(result);
+        this.setState({loading : false, result:result[0]})
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }
+  
+    renderList (result) {
+      return (
+        <main>
+        <div className="media-body ">
+          {
+            this.state.result.map((value, index) => {
+              return (
+             <p key={index}>{ value.title }</p>
+                 )
+            })
+          }
+        </div>
+        </main>
+      )
+    }
+    render () {
+      const {loading, result} = this.state
+      return (this.state.loading) ? <h1>loading...</h1> : this.renderList(result[0])
+    }
+  }
